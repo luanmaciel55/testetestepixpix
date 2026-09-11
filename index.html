@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sandbox PagBank - Homologação Pix</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;color:#172033}.wrap{min-height:100vh;display:grid;place-items:center;padding:24px}.card{width:min(680px,100%);background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(20,35,70,.12);padding:28px}.tag{display:inline-block;background:#fff3cd;color:#745600;font-weight:800;padding:8px 12px;border-radius:999px}h1{font-size:30px;margin:16px 0 8px}.price{font-size:40px;font-weight:800}.sub{color:#5d687b;line-height:1.5}.warning{background:#fff8e7;border:1px solid #f0d37a;padding:13px;border-radius:12px;margin:18px 0}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{display:block;font-weight:700;font-size:13px;margin:12px 0 6px}input{width:100%;padding:13px;border:1px solid #d6dce8;border-radius:10px;font-size:16px}button,.btn{width:100%;padding:14px;border:0;border-radius:11px;font-weight:800;font-size:15px;cursor:pointer;text-decoration:none;text-align:center;display:block}.primary{background:#1b55e6;color:#fff;margin-top:18px}.secondary{background:#eef2ff;color:#243b99;margin-top:10px}.download{display:none;background:#0a8f4f;color:white;margin-top:12px}.status{margin-top:18px;padding:14px;border-radius:12px;background:#f3f5f9;font-weight:700}.ok{background:#e9fbef;color:#08783f}.err{background:#fff0f0;color:#a51e1e}.pixbox,.logs{display:none;margin-top:22px;border-top:1px solid #e7eaf0;padding-top:20px}.qr{width:230px;max-width:100%;display:block;margin:12px auto}.copy{word-break:break-all;background:#f4f6fa;padding:12px;border-radius:10px;font-family:monospace;font-size:12px}.small{font-size:12px;color:#748095;line-height:1.5}.loggrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.logbtn{background:#172033;color:#fff}@media(max-width:560px){.row,.loggrid{grid-template-columns:1fr}.card{padding:20px}}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;color:#172033}.wrap{min-height:100vh;display:grid;place-items:center;padding:24px}.card{width:min(680px,100%);background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(20,35,70,.12);padding:28px}.tag{display:inline-block;background:#fff3cd;color:#745600;font-weight:800;padding:8px 12px;border-radius:999px}h1{font-size:30px;margin:16px 0 8px}.price{font-size:40px;font-weight:800}.sub{color:#5d687b;line-height:1.5}.warning{background:#fff8e7;border:1px solid #f0d37a;padding:13px;border-radius:12px;margin:18px 0}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{display:block;font-weight:700;font-size:13px;margin:12px 0 6px}input{width:100%;padding:13px;border:1px solid #d6dce8;border-radius:10px;font-size:16px}button,.btn{width:100%;padding:14px;border:0;border-radius:11px;font-weight:800;font-size:15px;cursor:pointer;text-decoration:none;text-align:center;display:block}.primary{background:#1b55e6;color:#fff;margin-top:18px}.download{display:none;background:#0a8f4f;color:white;margin-top:12px}.status{margin-top:18px;padding:14px;border-radius:12px;background:#f3f5f9;font-weight:700}.ok{background:#e9fbef;color:#08783f}.err{background:#fff0f0;color:#a51e1e}.pixbox,.logs{display:none;margin-top:22px;border-top:1px solid #e7eaf0;padding-top:20px}.qr{width:230px;max-width:100%;display:block;margin:12px auto}.copy{word-break:break-all;background:#f4f6fa;padding:12px;border-radius:10px;font-family:monospace;font-size:12px}.small{font-size:12px;color:#748095;line-height:1.5}.loggrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.logbtn{background:#172033;color:#fff}@media(max-width:560px){.row,.loggrid{grid-template-columns:1fr}.card{padding:20px}}
 </style>
 </head>
 <body><main class="wrap"><section class="card">
@@ -14,9 +14,9 @@
 <p class="sub">Este teste cria um pedido Pix no ambiente Sandbox do PagBank, acompanha o status e prepara os arquivos reais de request e response.</p>
 <div class="warning"><b>Não tente pagar o QR Code no seu banco.</b> No Sandbox o pagamento é simulado pelo PagBank.</div>
 <form id="form">
-<label>Nome completo</label><input id="name" required>
-<label>E-mail</label><input id="email" type="email" required>
-<div class="row"><div><label>CPF</label><input id="cpf" required maxlength="14"></div><div><label>Celular com DDD</label><input id="phone" required maxlength="16"></div></div>
+<label for="name">Nome completo</label><input id="name" required>
+<label for="email">E-mail</label><input id="email" type="email" required>
+<div class="row"><div><label for="cpf">CPF</label><input id="cpf" required maxlength="14"></div><div><label for="phone">Celular com DDD</label><input id="phone" required maxlength="16"></div></div>
 <button class="primary" id="generate" type="submit">GERAR NOVO TESTE SANDBOX</button>
 </form>
 <div id="status" class="status" style="display:none"></div>
@@ -30,7 +30,18 @@
 <p class="small">Seu token Sandbox permanece somente no servidor da Vercel e não é colocado nos arquivos.</p>
 </section></main>
 <script>
-const form=document.getElementById('form'),statusBox=document.getElementById('status'),pixbox=document.getElementById('pixbox'),qr=document.getElementById('qr'),copytext=document.getElementById('copytext'),download=document.getElementById('download'),logs=document.getElementById('logs'),generate=document.getElementById('generate');
+const form=document.getElementById('form');
+const statusBox=document.getElementById('status');
+const pixbox=document.getElementById('pixbox');
+const qr=document.getElementById('qr');
+const copytext=document.getElementById('copytext');
+const download=document.getElementById('download');
+const logs=document.getElementById('logs');
+const generate=document.getElementById('generate');
+const nameInput=document.getElementById('name');
+const emailInput=document.getElementById('email');
+const cpfInput=document.getElementById('cpf');
+const phoneInput=document.getElementById('phone');
 let timer=null, createReq=null, createRes=null, statusReq=null, statusRes=null;
 function show(m,t=''){statusBox.style.display='block';statusBox.textContent=m;statusBox.className='status'+(t==='ok'?' ok':t==='err'?' err':'')}
 function saveJson(name,obj){const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000)}
@@ -38,9 +49,17 @@ document.getElementById('d1').onclick=()=>saveJson('01_request_criar_pix.json',c
 document.getElementById('d2').onclick=()=>saveJson('02_response_criar_pix.json',createRes);
 document.getElementById('d3').onclick=()=>saveJson('03_request_consultar_pedido.json',statusReq);
 document.getElementById('d4').onclick=()=>saveJson('04_response_consultar_pedido.json',statusRes);
-form.addEventListener('submit',async e=>{e.preventDefault();clearInterval(timer);logs.style.display='none';pixbox.style.display='none';download.style.display='none';generate.disabled=true;show('Criando pedido no Sandbox...');try{
-const r=await fetch('/api/create-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name.value,email:email.value,cpf:cpf.value,phone:phone.value})});const data=await r.json();if(data.homologation){createReq=data.homologation.request;createRes=data.homologation.response}if(!r.ok)throw new Error(data.error||'Falha ao criar pedido.');
-pixbox.style.display='block';copytext.textContent=data.qrText||'Sandbox sem código Pix disponível.';if(data.qrImage){qr.src=data.qrImage;qr.style.display='block'}else qr.style.display='none';show('Pedido criado. Aguardando o Sandbox confirmar...');
-const check=async()=>{const sres=await fetch('/api/status?order_id='+encodeURIComponent(data.orderId),{cache:'no-store'});const s=await sres.json();if(s.homologation){statusReq=s.homologation.request;statusRes=s.homologation.response}if(!sres.ok)return;if(s.status==='PAID'){clearInterval(timer);show('SUCESSO: Sandbox retornou PAID. Arquivos de homologação prontos.','ok');download.href='/api/download?order_id='+encodeURIComponent(data.orderId);download.style.display='block';logs.style.display='block'}else{show('Status atual do Sandbox: '+s.status)}};await check();timer=setInterval(check,3000);
-}catch(err){show(err.message,'err')}finally{generate.disabled=false}});
+form.addEventListener('submit',async e=>{
+  e.preventDefault();clearInterval(timer);logs.style.display='none';pixbox.style.display='none';download.style.display='none';generate.disabled=true;show('Criando pedido no Sandbox...');
+  try{
+    const payload={name:nameInput.value.trim(),email:emailInput.value.trim(),cpf:cpfInput.value.trim(),phone:phoneInput.value.trim()};
+    const r=await fetch('/api/create-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data=await r.json();
+    if(data.homologation){createReq=data.homologation.request;createRes=data.homologation.response}
+    if(!r.ok)throw new Error(data.error||'Falha ao criar pedido.');
+    pixbox.style.display='block';copytext.textContent=data.qrText||'Sandbox sem código Pix disponível.';if(data.qrImage){qr.src=data.qrImage;qr.style.display='block'}else qr.style.display='none';show('Pedido criado. Aguardando o Sandbox confirmar...');
+    const check=async()=>{const sres=await fetch('/api/status?order_id='+encodeURIComponent(data.orderId),{cache:'no-store'});const s=await sres.json();if(s.homologation){statusReq=s.homologation.request;statusRes=s.homologation.response}if(!sres.ok)return;if(s.status==='PAID'){clearInterval(timer);show('SUCESSO: Sandbox retornou PAID. Arquivos de homologação prontos.','ok');download.href='/api/download?order_id='+encodeURIComponent(data.orderId);download.style.display='block';logs.style.display='block'}else{show('Status atual do Sandbox: '+s.status)}};
+    await check();timer=setInterval(check,3000);
+  }catch(err){show(err.message,'err')}finally{generate.disabled=false}
+});
 </script></body></html>

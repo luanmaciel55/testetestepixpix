@@ -16,11 +16,12 @@ module.exports = async function handler(req, res) {
     const host = req.headers['x-forwarded-host'] || req.headers.host;
     const origin = `${proto}://${host}`;
     const orderNsu = `teste-infinitepay-${Date.now()}`;
+    const redirectUrl = `${origin}/infinitepay-sucesso.html?handle=${encodeURIComponent(cleanHandle)}`;
 
     const payload = {
       handle: cleanHandle,
       order_nsu: orderNsu,
-      redirect_url: `${origin}/infinitepay-sucesso.html`,
+      redirect_url: redirectUrl,
       items: [
         {
           quantity: 1,
@@ -58,7 +59,8 @@ module.exports = async function handler(req, res) {
     return res.status(201).json({
       checkoutUrl,
       orderNsu,
-      amount: 100
+      amount: 100,
+      realCharge: true
     });
   } catch (err) {
     console.error('infinitepay-create:', err);

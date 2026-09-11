@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste InfinitePay - R$ 1,00</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;color:#172033}.wrap{min-height:100vh;display:grid;place-items:center;padding:24px}.card{width:min(620px,100%);background:#fff;border-radius:22px;box-shadow:0 20px 60px rgba(20,35,70,.12);padding:28px}.tag{display:inline-block;background:#eef8ff;color:#145da0;font-weight:800;padding:8px 12px;border-radius:999px;font-size:13px}h1{font-size:30px;margin:16px 0 6px}.price{font-size:42px;font-weight:800;margin:6px 0 8px}.sub{color:#5d687b;line-height:1.5;margin-bottom:20px}.info{background:#f3f8ff;border:1px solid #d6e8ff;padding:13px 14px;border-radius:12px;margin-bottom:18px;font-size:14px}label{display:block;font-size:13px;font-weight:700;margin:13px 0 6px}input{width:100%;padding:13px 14px;border:1px solid #d8deea;border-radius:11px;font-size:16px;outline:none}button,.btn{width:100%;border:0;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:800;cursor:pointer;text-decoration:none;text-align:center;display:block}.primary{background:#172033;color:#fff;margin-top:18px}.status{display:none;margin-top:18px;padding:14px;border-radius:12px;background:#f3f5f9;font-weight:700}.ok{background:#e9fbef;color:#08783f}.err{background:#fff0f0;color:#a51e1e}.small{font-size:12px;color:#748095;margin-top:16px;line-height:1.5}.btn{display:none;background:#0a8f4f;color:#fff;margin-top:14px}@media(max-width:560px){.card{padding:20px}h1{font-size:25px}.price{font-size:36px}}
+</style>
+</head>
+<body>
+<main class="wrap"><section class="card">
+<span class="tag">TESTE INFINITEPAY</span>
+<h1>Checkout Integrado</h1>
+<div class="price">R$ 1,00</div>
+<p class="sub">Este teste cria um checkout real da InfinitePay. Você será enviado para a página oficial da InfinitePay para escolher Pix ou cartão, conforme estiver habilitado na sua conta.</p>
+<div class="info"><b>Antes:</b> no app/site da InfinitePay, habilite o <b>Checkout Integrado</b>. Depois informe abaixo sua <b>InfiniteTag</b> sem o símbolo <b>$</b>.</div>
+<form id="form">
+<label for="handle">Sua InfiniteTag</label>
+<input id="handle" required placeholder="exemplo: luanmaciel">
+<button id="btn" class="primary" type="submit">Criar checkout de R$ 1,00</button>
+</form>
+<div id="status" class="status"></div>
+<a id="pay" class="btn" target="_blank" rel="noopener">Abrir checkout InfinitePay</a>
+<p class="small">A InfiniteTag é um identificador público da sua conta. Este teste não pede senha, token ou dados bancários.</p>
+</section></main>
+<script>
+const form=document.getElementById('form');
+const btn=document.getElementById('btn');
+const statusBox=document.getElementById('status');
+const pay=document.getElementById('pay');
+function show(msg,type=''){statusBox.style.display='block';statusBox.textContent=msg;statusBox.className='status'+(type==='ok'?' ok':type==='err'?' err':'')}
+form.addEventListener('submit',async(e)=>{
+ e.preventDefault();btn.disabled=true;pay.style.display='none';show('Criando checkout na InfinitePay...');
+ try{
+  const r=await fetch('/api/infinitepay-create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({handle:document.getElementById('handle').value})});
+  const data=await r.json();
+  if(!r.ok) throw new Error(data.error||'Não foi possível criar o checkout.');
+  pay.href=data.checkoutUrl;pay.style.display='block';show('Checkout criado com sucesso. Abra a InfinitePay para continuar.','ok');
+ }catch(err){show(err.message,'err')}finally{btn.disabled=false}
+});
+</script>
+</body>
+</html>

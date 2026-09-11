@@ -19,12 +19,15 @@ module.exports = async function handler(req, res) {
     if (!name || !email || taxId.length !== 11 || ![10,11].includes(phoneDigits.length)) {
       return res.status(400).json({ error: 'Preencha nome, e-mail, CPF com 11 dígitos e celular com DDD.' });
     }
+
     const reference = `sandbox-pix-${Date.now()}`;
     const expiration = new Date(Date.now() + 30 * 60 * 1000).toISOString();
     const payload = {
       reference_id: reference,
       customer: {
-        name: String(name).trim(), email: String(email).trim(), tax_id: taxId,
+        name: String(name).trim(),
+        email: String(email).trim(),
+        tax_id: taxId,
         phones: [{ country:'55', area:phoneDigits.slice(0,2), number:phoneDigits.slice(2), type:'MOBILE' }]
       },
       items: [{ reference_id:'planilha-teste', name:'Planilha Digital - Teste Sandbox', quantity:1, unit_amount:1 }],
@@ -36,20 +39,37 @@ module.exports = async function handler(req, res) {
       }]
     };
 
+    const logRequest = {
+      method: 'POST',
+      url: `${PAGBANK_API}/orders`,
+      headers: { Authorization:'Bearer ********', Accept:'application/json', 'Content-Type':'application/json' },
+      body: payload
+    };
+
     const response = await fetch(`${PAGBANK_API}/orders`, {
       method:'POST',
       headers:{ Authorization:`Bearer ${token}`, Accept:'application/json', 'Content-Type':'application/json' },
       body:JSON.stringify(payload)
     });
     const data = await response.json().catch(() => ({}));
+
     if (!response.ok) {
       const msg = data?.error_messages?.[0]?.description || data?.message || 'O Sandbox PagBank recusou a criação do Pix.';
-      return res.status(response.status).json({ error:msg, sandbox:true });
+      return res.status(response.status).json({ error:msg, sandbox:true, homologation:{request:logRequest,response:data} });
     }
+
     const charge = data?.charges?.[0];
     const qrImage = charge?.links?.find(l => l.rel === 'QRCODE.PNG')?.href || null;
     const qrText = charge?.qr_code?.text || null;
-    return res.status(201).json({ orderId:data.id, status:charge?.status || 'UNKNOWN', qrText, qrImage, sandbox:true });
+
+    return res.status(201).json({
+      orderId:data.id,
+      status:charge?.status || 'UNKNOWN',
+      qrText,
+      qrImage,
+      sandbox:true,
+      homologation:{ request:logRequest, response:data }
+    });
   } catch (e) {
     console.error('sandbox create-pix:', e);
     return res.status(500).json({ error:'Falha interna no teste Sandbox.' });
